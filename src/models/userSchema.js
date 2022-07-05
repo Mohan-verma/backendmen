@@ -1,7 +1,31 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+
 const userSchema = new mongoose.Schema({
+    phonenumber: {
+        type: Number,
+        required: true,
+        min: 10,
+        // unique: [true, 'phone number already exist']
+    },
+    language: {
+        lang: {
+            type: String,
+            required: true,
+
+        },
+        currency: {
+            type: String,
+            required: true,
+
+        }
+    },
+    dob: {
+        type: Date,
+        required: true,
+    },
+
     firstname: {
         type: String,
         required: true,
@@ -12,55 +36,50 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 3
     },
-    phonenumber: {
-        type: Number,
-        required: true,
-        min: 10,
-        // unique: [true, 'phone number already exist']
-    },
-    language: {
-        type: String,
-        required: true,
-
-    },
-    dob: {
-        type: Date,
-        required: true,
-    },
-    currency: {
-        type: String,
-        required: true,
-
-    },
     address: {
-        type: String,
-        required: true,
-    },
-    houseno: {
-        type: String,
-        required: true,
-    },
-    state: {
-        type: String,
-        required: true,
-    },
-    city: {
-        type: String,
-        required: true,
-    },
-    street: {
-        type: String,
-        required: true,
-    },
-    zipcode: {
-        type: String,
-        required: true,
-    },
-    issuingcountry: {
-        type: String,
-        required: true,
-    },
+        houseno: {
+            type: String,
+            required: true,
+        },
+        street: {
+            type: String,
+            required: true,
+        },
+        city: {
+            type: String,
+            required: true,
+        },
+        state: {
+            type: String,
+            required: true,
+        },
+        zipcode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        },
 
+    }
+})
+
+
+
+const idProof = new mongoose.Schema({
+    issu_country: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        required: true,
+    },
+    name: {
+        type: String,
+
+    },
     front: {
         type: String,
 
@@ -69,32 +88,16 @@ const userSchema = new mongoose.Schema({
         type: String,
 
     },
-    selfie: {
-        type: String,
-
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     }
 
 })
-const emegencySchema = new mongoose.Schema({
-    emname: {
-        type: String,
-        required: true,
-    },
-    emnumber: {
-        type: String,
-        required: true,
-    },
-    emrelationship: {
-        type: String,
-        required: true,
-    },
-    ememail: {
-        type: String,
-        required: true,
-    },
-    emlanguage: {
-        type: String,
-        required: true,
+
+const selfieSchema = new mongoose.Schema({
+    selfie: {
+        type: String
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -102,7 +105,45 @@ const emegencySchema = new mongoose.Schema({
     }
 })
 
+
+
+
+const emegencySchema = new mongoose.Schema({
+    emergencyData: {
+        emname: {
+            type: String,
+            required: true,
+        },
+        emnumber: {
+            type: String,
+            required: true,
+        },
+        emrelationship: {
+            type: String,
+            required: true,
+        },
+        ememail: {
+            type: String,
+            required: true,
+        },
+        emlanguage: {
+            type: String,
+            required: true,
+        },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    }
+})
+
+
+
+
+
+
 const User = new mongoose.model('User', userSchema);
 const Emergency = new mongoose.model('Emergency', emegencySchema);
-
-module.exports = { User, Emergency };
+const IdProof = new mongoose.model('IdProof', idProof);
+const Selfie = new mongoose.model('Selfie', selfieSchema)
+module.exports = { User, Emergency, IdProof, Selfie };

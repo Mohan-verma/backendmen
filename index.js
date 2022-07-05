@@ -2,7 +2,7 @@
 const express = require('express')
 const multer = require('multer')
 require('./src/db/conn')
-const { User, Emergency } = require('./src/models/userSchema')
+const { User, Emergency, IdProof, Selfie } = require('./src/models/userSchema')
 const PORT = process.env.PORT || 3000;
 const path = require('path');
 const { create } = require('domain');
@@ -25,7 +25,8 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 
-var multipleimages = upload.fields([{ name: "front" }, { name: "back" }, { name: "selfie" }])
+
+var idimages = upload.fields([{ name: "front" }, { name: "back" }])
 
 //routes started 
 
@@ -42,48 +43,35 @@ app.get("/", (req, res) => {
 //post users
 
 
-app.post("/users", multipleimages, (req, res) => {
+app.post("/users", (req, res) => {
 
     console.log("HELLO", req.body)
 
     const user = new User({
+        phonenumber: req.body.phonenumber,
         firstname: req.body.firstname,
         lastname: req.body.lastname,
-        phonenumber: req.body.phonenumber,
-        language: req.body.language,
         dob: req.body.dob,
-        currency: req.body.currency,
-        address: req.body.address,
-        houseno: req.body.houseno,
-        state: req.body.state,
-        city: req.body.city,
-        street: req.body.street,
-        zipcode: req.body.zipcode,
-        issuingcountry: req.body.issuingcountry,
+        language: {
+            lang: req.body.lang,
+            currency: req.body.currency
+        },
+        address: {
+            houseno: req.body.houseno,
+            street: req.body.street,
+            city: req.body.city,
+            state: req.body.state,
+            zipcode: req.body.zipcode,
+            country: req.body.country,
+        },
     })
     //user save
     user.save().then((resolve) => {
         console.log(resolve._id)
-        res.json(resolve)
+        res.send({ message: "user registered", value: req.body })
 
-        //emegency data
-        const emergency = new Emergency({
 
-            emname: req.body.emname,
-            emnumber: req.body.emnumber,
-            emrelationship: req.body.emrelationship,
-            ememail: req.body.ememail,
-            emlanguage: req.body.emlanguage,
-            user: resolve._id,
-        })
 
-        //emergency save
-        emergency.save().then((resolve) => {
-            console.log("emergencydetails saved")
-            res.json("emergency details saved")
-        }).catch(err => {
-            console.log("emergency", err)
-        })
 
     })
         .catch(err => {
@@ -92,36 +80,105 @@ app.post("/users", multipleimages, (req, res) => {
 })
 
 
+app.post("/idproof", idimages, (req, res) => {
+    console.log("Id details", req.body)
+    const idproof = new IdProof({
+        // issu_country: req.body.issu_country,
+        // type: req.body.type,
+        // name: req.body.name,
+        front: req.files.front[0]["filename"],
+        back: req.files.back[0]["filename"],
+        user: req.body.user
+    })
+    idproof.save()
+        .then((response) => {
+            console.log(response)
+            res.send({ message: "proofs uploaded", value: req.files })
+        })
+        .catch(err => {
+            console.log(err)
+            res.send(err)
+        })
+})
 
 
+
+// selfie post
+
+app.post("/selfie", upload.single("selfie"), (req, res) => {
+    console.log("Id details", req.file)
+    const selfieup = new Selfie({
+        selfie: req.file["filename"],
+        user: req.body.user
+    })
+    selfieup.save()
+        .then((response) => {
+            console.log("selfie", response)
+            res.send({ message: "selfie uploaded", value: req.file })
+        })
+        .catch(err => {
+            console.log(err)
+            res.send(err)
+        })
+})
+
+//end
+
+//emergency post 
+app.post('/emergency', (req, res) => {
+    const emergency = new Emergency({
+
+        emergencyData: {
+            emname: req.body.emname,
+            emnumber: req.body.emnumber,
+            emrelationship: req.body.emrelationship,
+            ememail: req.body.ememail,
+            emlanguage: req.body.emlanguage,
+            user: req.body.user
+        }
+
+    })
+
+
+    //emergency save
+    emergency.save().then((resolve) => {
+        console.log("emergencydetails saved", resolve)
+
+        res.json(resolve)
+
+    }).catch(err => {
+        console.log("emergency", err)
+    })
+})
+//end 
 
 
 // //get users
 
 
 app.get('/users', async (req, res) => {
-    // try {
-    //     const alldata = await User.find()
-
-
-    //     res.send(alldata)
-
-
-    // }
-    // catch (e) {
-    //     res.send(e)
-    // }
     try {
-        const emer = await Emergency.find().populate("user")
+        const alldata = await User.find()
 
 
-        res.send(emer)
+        res.send(alldata)
 
 
     }
     catch (e) {
         res.send(e)
     }
+    // try {
+    //     const emer = await Emergency.find().populate("user")
+
+
+    //     res.send(emer)
+
+
+    // }
+    // catch (e) {
+    //     res.send(e)
+    // }
 
 
 
