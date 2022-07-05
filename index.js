@@ -83,9 +83,9 @@ app.post("/users", (req, res) => {
 app.post("/idproof", idimages, (req, res) => {
     console.log("Id details", req.body)
     const idproof = new IdProof({
-        // issu_country: req.body.issu_country,
-        // type: req.body.type,
-        // name: req.body.name,
+        issu_country: req.body.issu_country,
+        type: req.body.type,
+        name: req.body.name,
         front: req.files.front[0]["filename"],
         back: req.files.back[0]["filename"],
         user: req.body.user
