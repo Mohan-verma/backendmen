@@ -2,12 +2,14 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 
+const phonenumberSchema = new mongoose.Schema({
+    Phonenumber: String
+})
+
 const userSchema = new mongoose.Schema({
-    phonenumber: {
-        type: Number,
-        required: true,
-        min: 10,
-        // unique: [true, 'phone number already exist']
+    phoneNo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Phonenumber"
     },
     language: {
         lang: {
@@ -91,7 +93,11 @@ const idProof = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    phoneNo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Phonenumber"
+    },
 
 })
 
@@ -102,7 +108,11 @@ const selfieSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    phoneNo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Phonenumber"
+    },
 })
 
 
@@ -133,7 +143,11 @@ const emegencySchema = new mongoose.Schema({
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
-        }
+        },
+        phoneNo: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Phonenumber"
+        },
     }
 })
 
@@ -141,9 +155,9 @@ const emegencySchema = new mongoose.Schema({
 
 
 
-
+const OtpNUmber = new mongoose.model("Phonenumber", phonenumberSchema)
 const User = new mongoose.model('User', userSchema);
 const Emergency = new mongoose.model('Emergency', emegencySchema);
 const IdProof = new mongoose.model('IdProof', idProof);
 const Selfie = new mongoose.model('Selfie', selfieSchema)
-module.exports = { User, Emergency, IdProof, Selfie };
+module.exports = { User, Emergency, IdProof, Selfie, OtpNUmber };
