@@ -5,10 +5,10 @@ const express = require('express')
 const multer = require('multer')
 require('./src/db/conn')
 const { User, Emergency, IdProof, Selfie, OtpNUmber } = require('./src/models/userSchema')
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const path = require('path');
-const { create } = require('domain');
-const { config } = require('dotenv')
+// const { create } = require('domain');
+// const { config } = require('dotenv')
 
 //twilio
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -58,7 +58,7 @@ app.post("/login", (req, res) => {
         const chann = "sms";
         client
             .verify
-            .services(process.env.SECURITY_ID)
+            .services(process.env.SECURITY)
             .verifications
             .create({ to: number, channel: chann })
             // then statement twilio
@@ -100,7 +100,7 @@ app.post("/verify", (req, res) => {
 
     console.log("THIS IS NUMBER", number, codes);
 
-    client.verify.services(process.env.SECURITY_ID)
+    client.verify.services(process.env.SECURITY)
         .verificationChecks
         .create({ to: number, code: codes })
 
@@ -115,10 +115,12 @@ app.post("/verify", (req, res) => {
             else {
 
                 const otpdata = new OtpNUmber({
-                    user: req.body.number,
+                    Phonenumber: req.body.number,
                     status: verification_check.status,
                 })
-                otpdata.save()
+                otpdata.save({
+                    Phonenumber: req.body.number
+                })
                     .then(response => {
                         // const phone_id = response._id
                         // console.log(phone_id)
