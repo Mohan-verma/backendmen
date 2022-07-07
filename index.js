@@ -7,6 +7,7 @@ require('./src/db/conn')
 const { User, Emergency, IdProof, Selfie, OtpNUmber } = require('./src/models/userSchema')
 const PORT = process.env.PORT || 4000;
 const path = require('path');
+const { UserBindingContext } = require('twilio/lib/rest/chat/v2/service/user/userBinding')
 // const { create } = require('domain');
 // const { config } = require('dotenv')
 
@@ -53,7 +54,7 @@ app.post("/login", (req, res) => {
 
 
     if (number.length >= 13) {
-        console.log(req.body)
+        // console.log(req.body)
         const number = req.body.number;
         const chann = "sms";
         client
@@ -77,11 +78,6 @@ app.post("/login", (req, res) => {
         console.log("number is invalid invalid format plz ensure that you have filled your country code as well as number")
         res.send("number is invalid invalid format plz ensure that you have filled your country code as well as number")
     }
-
-
-
-
-
 
 })
 
@@ -142,11 +138,6 @@ app.post("/verify", (req, res) => {
         });
 
 
-    /*client.verify.services('VAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-               .verifications
-               .create({to: '+15017122661', channel: 'sms'})
-               .then(verification => console.log(verification.status));*/
-
 })
 
 
@@ -178,7 +169,7 @@ app.post("/users", (req, res) => {
     //user save
     user.save().then((resolve) => {
         console.log(resolve._id)
-        res.send({ message: "user registered", value: req.body })
+        res.send({ message: "user registered", value: req.body, userid: resolve._id })
 
 
 
@@ -243,8 +234,10 @@ app.post('/emergency', (req, res) => {
             emnumber: req.body.emnumber,
             emrelationship: req.body.emrelationship,
             ememail: req.body.ememail,
+
             emlanguage: req.body.emlanguage,
-            user: req.body.user
+            // user: req.body.user,
+            phoneNo: req.body.phoneNo,
         }
 
     })
@@ -268,9 +261,36 @@ app.post('/emergency', (req, res) => {
 
 app.get('/users', async (req, res) => {
     try {
-        const alldata = await User.find()
+        const alldata = await User.find().populate("phoneNo")
 
 
+        res.send(alldata)
+
+        console.log(alldata)
+    }
+    catch (e) {
+        res.send(e)
+    }
+    // try {
+    //     const emer = await Emergency.find().populate("user")
+
+
+    //     res.send(emer)
+
+
+    // }
+    // catch (e) {
+    //     res.send(e)
+    // }
+
+
+
+})
+app.get('/emergency', async (req, res) => {
+    try {
+        const alldata = await Emergency.find().populate("phoneNo")
+
+        console.log(alldata)
         res.send(alldata)
 
 
